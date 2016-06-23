@@ -2,7 +2,7 @@
 
 very basic, framework independent parser for overlap2d files
 
-## progress scenegraph
+## progress
 - [x] atlas parser - usable, wip
 - [x] images - usable, wip
 - [x] ninepatches - usable, wip
