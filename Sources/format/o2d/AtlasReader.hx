@@ -11,8 +11,6 @@ class AtlasReader {
 	}
 
 	public function read() : AtlasData.O2dAtlasData {
-		// (DK) what moron came up with this shitty format ...
-		
 		lines = data.split('\n');
 		lineIndex = -1;
 
