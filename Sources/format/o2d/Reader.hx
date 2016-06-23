@@ -3,10 +3,12 @@ package format.o2d;
 import format.o2d.Data.O2dComposite;
 import format.o2d.Data.O2dCompositeItem;
 import format.o2d.Data.O2dImageItem;
+import format.o2d.Data.O2dItem;
 import format.o2d.Data.O2dLayer;
 import format.o2d.Data.O2dNinepatchItem;
 import format.o2d.Data.O2dProject;
 import format.o2d.Data.O2dScene;
+import format.o2d.Data.O2dSpriterAnimationItem;
 
 class Reader {
 	var json : String;
@@ -62,11 +64,13 @@ class Reader {
 		var images : Array<Dynamic> = Reflect.field(d, 'sImages');
 		var ninepatches : Array<Dynamic> = Reflect.field(d, 'sImage9patchs');
 		var composites : Array<Dynamic> = Reflect.field(d, 'sComposites');
+		var spriterAnimations : Array<Dynamic> = Reflect.field(d, 'sSpriterAnimations');
 
 		return {
 			layers : [for (l in layers) resolveLayer(l)],
 			images : [for (i in images) resolveImageItem(i)],
 			ninepatches : ninepatches != null ? [for (np in ninepatches) resolveNinepatchItem(np)] : [],
+			spriterAnimations : spriterAnimations != null ? [for (sa in spriterAnimations) resolveSpriterAnimationItem(sa)] : [],
 			composites : composites != null ? [for (c in composites) resolveCompositeItem(c)] : [],
 		}
 	}
@@ -78,63 +82,63 @@ class Reader {
 		}
 	}
 
+	function resolveBasicItem( d : Dynamic, i : O2dItem ) {
+		i.uniqueId = Reflect.field(d, 'uniqueId');
+		i.id = Reflect.field(d, 'itemIdentifier');
+		//tags : Reflect.field(d, 'tags'), // TODO (DK) map to Array<String>
+		i.x = _ofloat(d, 'x', 0.0);
+		i.y = _ofloat(d, 'y', 0.0);
+		i.scaleX = _ofloat(d, 'scaleX', 1.0);
+		i.scaleY = _ofloat(d, 'scaleY', 1.0);
+		i.zIndex = _oint(d, 'zIndex', 0);
+		//originX : Reflect.field(d, 'originX'),
+		//originY : Reflect.field(d, 'originY'),
+		i.layerName = Reflect.field(d, 'layerName');
+		//tint : null, // TODO (DK)
+	}
+
 	function resolveImageItem( d : Dynamic ) : O2dImageItem {
-		return {
-			uniqueId : Reflect.field(d, 'uniqueId'),
-			id : Reflect.field(d, 'itemIdentifier'),
-			//tags : Reflect.field(d, 'tags'), // TODO (DK) map to Array<String>
-			x : _ofloat(d, 'x', 0.0),
-			y : _ofloat(d, 'y', 0.0),
-			scaleX : _ofloat(d, 'scaleX', 1.0),
-			scaleY : _ofloat(d, 'scaleY', 1.0),
-			zIndex : _oint(d, 'zIndex', 0),
-			//originX : Reflect.field(d, 'originX'),
-			//originY : Reflect.field(d, 'originY'),
-			layerName : Reflect.field(d, 'layerName'),
+		var ii = new O2dImageItem();
+		resolveBasicItem(d, ii);
 
-			imageName : Reflect.field(d, 'imageName'),
-
-			//tint : null, // TODO (DK)
-		}
+		ii.imageName = Reflect.field(d, 'imageName');
+		//ii.isRepeat
+		//ii.isPolygon
+		return ii;
 	}
 
 	function resolveNinepatchItem( d : Dynamic ) : O2dNinepatchItem {
-		return {
-			uniqueId : Reflect.field(d, 'uniqueId'),
-			id : Reflect.field(d, 'itemIdentifier'),
-			x : _float(d, 'x'),
-			y : _float(d, 'y'),
-			scaleX : _ofloat(d, 'scaleX', 1.0),
-			scaleY : _ofloat(d, 'scaleY', 1.0),
-			zIndex : _oint(d, 'zIndex', 0),
-			layerName : Reflect.field(d, 'layerName'),
+		var npi = new O2dNinepatchItem();
+		resolveBasicItem(d, npi);
 
-			imageName : Reflect.field(d, 'imageName'),
-			width : _float(d, 'width'),
-			height : _float(d, 'height'),
-		}
+		npi.imageName = Reflect.field(d, 'imageName');
+		npi.width = _float(d, 'width');
+		npi.height = _float(d, 'height');
+		return npi;
 	}
 
 	function resolveCompositeItem( d : Dynamic ) : O2dCompositeItem {
-		return {
-			uniqueId : Reflect.field(d, 'uniqueId'),
-			id : Reflect.field(d, 'itemIdentifier'),
-			itemName : Reflect.field(d, 'itemName'),
-			x : _float(d, 'x'),
-			y : _float(d, 'y'),
-			scaleX : _ofloat(d, 'scaleX', 1.0),
-			scaleY : _ofloat(d, 'scaleY', 1.0),
-			zIndex : _oint(d, 'zIndex', 0),
-			layerName : Reflect.field(d, 'layerName'),
+		var ci = new O2dCompositeItem();
+		resolveBasicItem(d, ci);
 
-			composite : resolveComposite(Reflect.field(d, 'composite')),
-			//scissorX : _float(d, 'scissorX', -1),
-			//scissorY : _float(d, 'scissorX', -1),
-			//scissorWidth : _float(d, 'scissorX', -1),
-			//scissorHeight : _float(d, 'scissorX', -1),
-			width : _float(d, 'width'),
-			height : _float(d, 'height'),
-		}
+		ci.composite = resolveComposite(Reflect.field(d, 'composite'));
+		//ci.scissorX : _float(d, 'scissorX', -1),
+		//ci.scissorY : _float(d, 'scissorX', -1),
+		//ci.scissorWidth : _float(d, 'scissorX', -1),
+		//ci.scissorHeight : _float(d, 'scissorX', -1),
+		ci.width = _float(d, 'width');
+		ci.height = _float(d, 'height');
+		return ci;
+	}
+
+	function resolveSpriterAnimationItem( d : Dynamic ) : O2dSpriterAnimationItem {
+		var sai = new O2dSpriterAnimationItem();
+		resolveBasicItem(d, sai);
+
+		sai.animationName = Reflect.field(d, 'animationName');
+		sai.animation = Reflect.field(d, 'animation');
+		sai.entityId = _oint(d, 'entity', 0);
+		return sai;
 	}
 
 	inline function _float( d : Dynamic, id : String ) : Float {

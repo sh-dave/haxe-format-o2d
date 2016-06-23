@@ -2,50 +2,53 @@ package format.o2d;
 
 // http://overlap2d.com/data-api-creating-custom-runtime/
 
-typedef O2dItem = {
-	uniqueId : Int,
-	id : String,
+class O2dItem {
+	public var uniqueId : Int;
+	public var id : String;
 	//public var tags : Array<String>;
 	//public var customVars : String;
 
-	x : Float,
-	y : Float,
-	scaleX : Float,
-	scaleY : Float,
+	public var x : Float;
+	public var y : Float;
+	public var scaleX : Float;
+	public var scaleY : Float;
 	//public var rotation : Float; // deg
 
 	//public var shader : String;
-	zIndex : Int,
+	public var zIndex : Int;
 	//public var originX : Float;
 	//public var originY : Float;
-	layerName : String,
+	public var layerName : String;
+
+	public function new() {
+	}
 }
 
-typedef O2dImageItem = {
-	> O2dItem,
-
-	imageName : String,
+class O2dImageItem extends O2dItem {
+	public var imageName : String;
 }
 
-typedef O2dNinepatchItem = {
-	> O2dItem,
-
-	imageName : String,
-	width : Float,
-	height : Float,
+class O2dNinepatchItem extends O2dItem {
+	public var imageName : String;
+	public var width : Float;
+	public var height : Float;
 }
 
-typedef O2dCompositeItem = {
-	> O2dItem,
-
-	composite : O2dComposite,
-	itemName : String, // TODO (DK) bug? not listed in the docs
+class O2dCompositeItem extends O2dItem {
+	public var composite : O2dComposite;
+	public var itemName : String; // TODO (DK) bug? not listed in the docs
 	//scissorX : Float,
 	//scissorY : Float,
 	//scissorWidth : Float,
 	//scissorHeight : Float,
-	width : Float,
-	height : Float,
+	public var width : Float;
+	public var height : Float;
+}
+
+class O2dSpriterAnimationItem extends O2dItem {
+	public var animationName : String;
+	public var entityId : Int;
+	public var animation : String;
 }
 
 //@:structInit
@@ -84,11 +87,12 @@ class O2dScenePhysics {
 @:structInit
 class O2dComposite {
 	public var layers : Array<O2dLayer>;
+
 	public var images : Array<O2dImageItem>;
 	public var ninepatches : Array<O2dNinepatchItem>;
-	public var composites : Array<O2dCompositeItem>;
+	public var spriterAnimations : Array<O2dSpriterAnimationItem>;
 
-	//spriterAnimations : Array<O2dSpriterAnimation>,
+	public var composites : Array<O2dCompositeItem>;
 }
 
 @:structInit
