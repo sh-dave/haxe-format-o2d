@@ -196,8 +196,6 @@ class ParticleReader {
 	}
 
 	public function read() : ParticleData.O2dParticleData {
-		// (DK) what moron came up with this shitty format ...
-		
 		lines = data.split('\n');
 		lineIndex = -1;
 
